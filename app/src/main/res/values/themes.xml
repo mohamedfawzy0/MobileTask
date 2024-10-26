@@ -1,0 +1,27 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.mobiletask" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:typeface">monospace</item>
+        <item name="fontFamily">@font/ar_font</item>
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="tabStyle" parent="@android:style/TextAppearance.Widget.TabWidget">
+        <item name="android:fontFamily">@font/ar_font</item>
+    </style>
+
+        <style name="CustomBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+            <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+        </style>
+
+        <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+            <item name="background">@drawable/rounded_top</item>
+        </style>
+
+
+</resources>
