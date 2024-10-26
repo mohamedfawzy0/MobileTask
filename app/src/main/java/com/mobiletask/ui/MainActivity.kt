@@ -20,7 +20,6 @@ import com.mobiletask.databinding.ActivityMainBinding
 import com.mobiletask.model.Category
 import com.mobiletask.model.PropertiesData
 import com.mobiletask.model.PropertiesData.Option
-import com.mobiletask.ui.optionsSheet.OnEnterValueListener
 import com.mobiletask.ui.optionsSheet.OnItemClickListener
 import com.mobiletask.ui.optionsSheet.OnSelectOptionListener
 import com.mobiletask.ui.optionsSheet.SheetSearchOptions
@@ -28,7 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListener,
-    OnEnterValueListener,
     OnSelectOptionListener {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by viewModels<MainViewModel>()
@@ -37,9 +35,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
     private var mainCategoryList = mutableListOf<Category>()
     private var tabledataList = ArrayList<TableData>()
     private var propertiesList = mutableListOf<PropertiesData>()
-    private val adapter: PropertiesAdapter by lazy { PropertiesAdapter(propertiesList, this, this) }
+    private val adapter: PropertiesAdapter by lazy { PropertiesAdapter(propertiesList, this) }
     private var position: Int? = null
-    private var etOther: String? = null
     private var propertyValue: String? = ""
     private var selecedOption: Option? = null
 
@@ -174,10 +171,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
                     position: Int,
                     id: Long
                 ) {
-                    if (position != 0) { // Ignore the placeholder (empty or "Select Subcategory")
+                    if (position != 0) {
                         selectedSubCategory = spinnerAdapter.getItem(position)
                     } else {
-                        selectedSubCategory = null // Nothing selected when placeholder is chosen
+                        selectedSubCategory = null
                     }
                     binding.propertiesProgress.isVisible = false
                     if (subCategoryList.isNotEmpty() && selectedSubCategory != null) {
@@ -187,7 +184,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // Optionally handle if nothing is selected
                 }
             }
     }
@@ -195,7 +191,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
 
     private fun initView() {
         initMainCategorySpinner(mainCategoryList)
-//        setSupportActionBar(binding.toolBar)
+        setSupportActionBar(binding.toolBar)
         binding.rvProperties.layoutManager = LinearLayoutManager(this)
         binding.rvProperties.adapter = adapter
     }
@@ -211,7 +207,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
         }
         viewModel.errorMessage.observe(this) {
             Snackbar.make(binding.root, it, Snackbar.LENGTH_INDEFINITE)
-                .setDuration(3000) // 3 seconds in milliseconds
+                .setDuration(3000)
                 .show()
             binding.constMainCategory.isVisible = false
             binding.constSubCategory.isVisible = false
@@ -238,15 +234,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
                     propertiesList.clear()
                     propertiesList.addAll(it)
 
-                    tabledataList.clear() // Clear previous data before adding new entries
+                    tabledataList.clear()
 
-                    // Loop through each property and add its name and selected value (if available)
                     for (property in propertiesList) {
                         val selectedOptionName = property.updatedValue
                         tabledataList.add(TableData(property.name, selectedOptionName))
                     }
                     binding.btnSubmet.isVisible = tabledataList.isNotEmpty()
-                    adapter.notifyDataSetChanged() // Update adapter if needed
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -290,50 +285,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, OnItemClickListe
         this.selecedOption = option
         position?.let { pos ->
             propertiesList[pos].updatedValue = option.name
-//            propertiesList[pos].isOther = option.name.equals("Other")
 
             val propertyKey = propertiesList[pos].name
-            propertyValue=option.name
-            /*if (option.name.equals("Other")) {
-                propertiesList[pos].otherInput = etOther // Update the model with the entered value
-                propertyValue = etOther // Set propertyValue to the entered value
-            } else {
-                propertyValue = option.name // Use the selected option's name
-            }*/
+            propertyValue = option.name
 
             val existingEntryIndex = tabledataList.indexOfFirst { it.key == propertyKey }
             tabledataList[existingEntryIndex].value = option.name
-            /*if (existingEntryIndex >= 0) {
-                tabledataList[existingEntryIndex].value = option.name
-            } else {
-                tabledataList.add(TableData(propertyKey, propertyValue!!))
-            }*/
-            adapter.notifyDataSetChanged() // Update the adapter if needed
+            adapter.notifyDataSetChanged()
         }
-    }
-
-
-    override fun onEnterValueListener(etOther: String, position: Int) {
-        /*this.etOther = etOther
-
-        position?.let { pos ->
-            val propertyKey = propertiesList[pos].name
-
-            // Check if the selected option is "Other" and handle accordingly
-            if (selecedOption!!.name.equals("Other") && propertiesList[pos].isOther && this.position == position) {
-                propertiesList[pos].otherInput = etOther // Update the model with the entered value
-                propertyValue = etOther // Set propertyValue to the entered value
-            } else {
-                propertyValue = selecedOption!!.name // Use the selected option's name
-            }
-
-            // Check if this property is already in tabledataList; if so, update it, otherwise add it
-            val existingEntryIndex = tabledataList.indexOfFirst { it.key == propertyKey }
-            if (existingEntryIndex == 0) {
-                tabledataList[existingEntryIndex].value = propertyValue!! // Update existing entry
-            } else {
-                tabledataList.add(TableData(propertyKey, propertiesList[position].updatedValue)) // Add new entry
-            }
-        }*/
     }
 }

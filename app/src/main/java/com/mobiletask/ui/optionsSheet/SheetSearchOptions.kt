@@ -1,6 +1,5 @@
 package com.mobiletask.ui.optionsSheet
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -11,18 +10,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import com.mobiletask.adapter.PropertiesChildAdapter
 import com.mobiletask.databinding.OptionsSheetLayoutBinding
 import com.mobiletask.model.PropertiesData
-import com.mobiletask.ui.MainViewModel
 import java.util.Locale
 
 class SheetSearchOptions(
@@ -34,7 +30,7 @@ class SheetSearchOptions(
     BottomSheetDialogFragment(), OnChildItemClickListener {
     private lateinit var binding: OptionsSheetLayoutBinding
     private var onSelectOptionsListener: OnSelectOptionListener
-    private  var optionsList: MutableList<PropertiesData.Option>
+    private var optionsList: MutableList<PropertiesData.Option>
     private val filteredSearchList: MutableList<PropertiesData.Option> = ArrayList()
     private val adapter: PropertiesChildAdapter by lazy {
         PropertiesChildAdapter(
@@ -63,38 +59,9 @@ class SheetSearchOptions(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        viewModel.getPropertiesChild(optionId)
-//        setUpObservers()
         initList()
         initListeners()
     }
-
-    /*private fun setUpObservers() {
-        viewModel.propertiesChildLoading.observe(this) {
-            binding.progressBar.isVisible = it
-        }
-        viewModel.errorMessage.observe(this) {
-            Snackbar.make(binding.root, it, Snackbar.LENGTH_INDEFINITE).show()
-        }
-        viewModel.propertiesChildLiveData.observe(this) {
-            it?.let {
-                binding.llNoOptions.isVisible = it.isEmpty()
-                if (it.isNotEmpty()) {
-                    searchList.clear()
-
-                    // Add your fixed item at the beginning of the list
-                    val otherItem = PropertiesData(id = 0, name = "Other") // Replace with actual data if needed
-                    searchList.add(otherItem)
-
-                    // Add the rest of the items
-                    searchList.addAll(it)
-                    adapter.notifyDataSetChanged()
-                }
-            }
-        }
-    }*/
-
-
 
     override fun onStart() {
         super.onStart()
@@ -105,14 +72,12 @@ class SheetSearchOptions(
             bottomSheetInternal?.let { bottomSheetView ->
                 val layoutParams = bottomSheetView.layoutParams as CoordinatorLayout.LayoutParams
 
-                // Set a custom height (e.g., 90% of the screen height)
                 val displayMetrics = resources.displayMetrics
                 val screenHeight = displayMetrics.heightPixels
-                layoutParams.height = (screenHeight * 0.9).toInt()  // 90% of screen height
+                layoutParams.height = (screenHeight * 0.9).toInt()
 
                 bottomSheetView.layoutParams = layoutParams
 
-                // Set behavior to expanded
                 val behavior = BottomSheetBehavior.from(bottomSheetView)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
@@ -130,7 +95,7 @@ class SheetSearchOptions(
         binding.ivClose.setOnClickListener { v -> dismiss() }
 
         binding.edSearch.addTextChangedListener(object : TextWatcher {
-            private val DEBOUNCE_DELAY: Long = 300 // milliseconds
+            private val DEBOUNCE_DELAY: Long = 300
             private val handler = Handler(Looper.getMainLooper())
             private var searchRunnable: Runnable? = null
 
@@ -165,16 +130,13 @@ class SheetSearchOptions(
                 finalQuery = query
                 searchRunnable = Runnable {
                     if (finalQuery.isEmpty()) {
-                        // Show the main list when query is empty
                         binding.icSearch.setVisibility(View.VISIBLE)
-//                        binding.icDelete.setVisibility(View.GONE)
                         binding.rvOptions.setVisibility(View.VISIBLE)
                         binding.llNoOptions.setVisibility(View.GONE)
                         filteredSearchList.clear()
                         filteredSearchList.addAll(optionsList)
                     } else {
                         binding.icSearch.setVisibility(View.GONE)
-                        // Filter the list based on the query
                         val filteredList: MutableList<PropertiesData.Option> =
                             ArrayList()
                         for (model in optionsList) {
